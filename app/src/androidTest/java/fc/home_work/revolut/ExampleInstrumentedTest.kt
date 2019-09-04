@@ -1,4 +1,4 @@
-package infinite_software.intelligence_center.revolut
+package fc.home_work.revolut
 
 import androidx.test.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4

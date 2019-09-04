@@ -1,6 +1,6 @@
-package infinite_software.intelligence_center.revolut.network
+package fc.home_work.revolut.network
 
-import infinite_software.intelligence_center.revolut.network.dto.LatestCurrencyRatesResponseDTO
+import fc.home_work.revolut.network.dto.LatestCurrencyRatesResponseDTO
 import io.reactivex.Single
 import retrofit2.http.GET
 import retrofit2.http.Query

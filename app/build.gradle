@@ -12,18 +12,28 @@ android {
     compileSdkVersion 28
 
     defaultConfig {
-        applicationId "infinite_software.intelligence_center.revolut"
+        applicationId "fc.home_work.revolut"
         minSdkVersion 16
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.debug
+
     }
 
     buildTypes {
-        release {
+
+        debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", 'BASE_RATES_URL', "\"https://revolut.duckdns.org/\""
+        }
+
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", 'BASE_RATES_URL', "\"https://revolut.duckdns.org/\""
         }
     }
 }
@@ -40,6 +50,7 @@ dependencies {
     def rxJavaVersion = "2.1.9"
     def rxAndroidVersion = "2.0.2"
     def dagger2_version = '2.16'
+    def roomVersion = "2.1.0"
     def sdpVersion = "1.0.6"
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -79,8 +90,14 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxjava:$rxJavaVersion"
     implementation "io.reactivex.rxjava2:rxandroid:$rxAndroidVersion"
 
+    //Room
+    implementation "androidx.room:room-runtime:$roomVersion"
+    implementation "androidx.room:room-rxjava2:$roomVersion"
+    kapt "androidx.room:room-compiler:$roomVersion"
+
     //Scalable dp and sp
     implementation "com.intuit.sdp:sdp-android:$sdpVersion"
     implementation "com.intuit.ssp:ssp-android:$sdpVersion"
+
 
 }

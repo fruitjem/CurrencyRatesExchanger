@@ -1,4 +1,4 @@
-package infinite_software.intelligence_center.revolut.network.dto
+package fc.home_work.revolut.network.dto
 
 
 import com.google.gson.annotations.SerializedName

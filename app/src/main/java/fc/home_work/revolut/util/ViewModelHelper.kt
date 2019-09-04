@@ -1,10 +1,10 @@
-package infinite_software.intelligence_center.revolut.util
+package fc.home_work.revolut.util
 
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
-import infinite_software.intelligence_center.revolut.base.BaseViewModelFactory
+import fc.home_work.revolut.base.BaseViewModelFactory
 
 inline fun <reified T : ViewModel> Fragment.getViewModel(noinline creator: (() -> T)? = null): T {
     return if (creator == null)

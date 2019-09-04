@@ -1,4 +1,4 @@
-package infinite_software.intelligence_center.revolut.base
+package fc.home_work.revolut.base
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

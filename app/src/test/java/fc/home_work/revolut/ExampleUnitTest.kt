@@ -1,4 +1,4 @@
-package infinite_software.intelligence_center.revolut
+package fc.home_work.revolut
 
 import org.junit.Test
 
