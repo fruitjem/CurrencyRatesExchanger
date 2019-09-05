@@ -28,4 +28,9 @@ abstract class BaseViewModel : ViewModel() {
         }
     }
 
+    override fun onCleared() {
+        subscription.clear()
+        super.onCleared()
+    }
+
 }

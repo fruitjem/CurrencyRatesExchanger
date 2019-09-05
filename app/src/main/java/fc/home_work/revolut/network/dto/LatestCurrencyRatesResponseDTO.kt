@@ -2,6 +2,7 @@ package fc.home_work.revolut.network.dto
 
 
 import com.google.gson.annotations.SerializedName
+import kotlin.reflect.KVisibility
 
 data class LatestCurrencyRatesResponseDTO(
     @SerializedName("base")
@@ -13,68 +14,80 @@ data class LatestCurrencyRatesResponseDTO(
 ) {
     data class Rates (
         @SerializedName("AUD")
-        val aUD: Double,
+        val AUD: Double,
         @SerializedName("BGN")
-        val bGN: Double,
+        val BGN: Double,
         @SerializedName("BRL")
-        val bRL: Double,
+        val BRL: Double,
         @SerializedName("CAD")
-        val cAD: Double,
+        val CAD: Double,
         @SerializedName("CHF")
-        val cHF: Double,
+        val CHF: Double,
         @SerializedName("CNY")
-        val cNY: Double,
+        val CNY: Double,
         @SerializedName("CZK")
-        val cZK: Double,
+        val CZK: Double,
         @SerializedName("DKK")
-        val dKK: Double,
+        val DKK: Double,
         @SerializedName("GBP")
-        val gBP: Double,
+        val GBP: Double,
         @SerializedName("HKD")
-        val hKD: Double,
+        val HKD: Double,
         @SerializedName("HRK")
-        val hRK: Double,
+        val HRK: Double,
         @SerializedName("HUF")
-        val hUF: Double,
+        val HUF: Double,
         @SerializedName("IDR")
-        val iDR: Double,
+        val IDR: Double,
         @SerializedName("ILS")
-        val iLS: Double,
+        val ILS: Double,
         @SerializedName("INR")
-        val iNR: Double,
+        val INR: Double,
         @SerializedName("ISK")
-        val iSK: Double,
+        val ISK: Double,
         @SerializedName("JPY")
-        val jPY: Double,
+        val JPY: Double,
         @SerializedName("KRW")
-        val kRW: Double,
+        val KRW: Double,
         @SerializedName("MXN")
-        val mXN: Double,
+        val MXN: Double,
         @SerializedName("MYR")
-        val mYR: Double,
+        val MYR: Double,
         @SerializedName("NOK")
-        val nOK: Double,
+        val NOK: Double,
         @SerializedName("NZD")
-        val nZD: Double,
+        val NZD: Double,
         @SerializedName("PHP")
-        val pHP: Double,
+        val PHP: Double,
         @SerializedName("PLN")
-        val pLN: Double,
+        val PLN: Double,
         @SerializedName("RON")
-        val rON: Double,
+        val RON: Double,
         @SerializedName("RUB")
-        val rUB: Double,
+        val RUB: Double,
         @SerializedName("SEK")
-        val sEK: Double,
+        val SEK: Double,
         @SerializedName("SGD")
-        val sGD: Double,
+        val SGD: Double,
         @SerializedName("THB")
-        val tHB: Double,
+        val THB: Double,
         @SerializedName("TRY")
-        val tRY: Double,
+        val TRY: Double,
         @SerializedName("USD")
-        val uSD: Double,
+        val USD: Double,
         @SerializedName("ZAR")
-        val zAR: Double
-    )
+        val ZAR: Double
+    ){
+        fun getValueByCurrencyID(currencyID:String):Double?{
+            this::class.members.forEach {
+                if (it.visibility == KVisibility.PUBLIC) {
+                    if(it.name == currencyID)
+                        return it.call(this) as Double
+
+                }
+            }
+
+            return null
+        }
+    }
 }

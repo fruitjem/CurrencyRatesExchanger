@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit
 object NetworkModule {
 
     /**
-     * Provides the Rates service implementation for Currency Rates
+     * Provides the Rates service implementation for CurrencyModel Rates
      */
     @Provides
     @Reusable

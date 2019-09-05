@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Revolut</string>
+
+    <string-array name="currencies">
+        <item>USD</item>
+        <item>EUR</item>
+        <item>SEK</item>
+        <item>CAD</item>
+    </string-array>
+
 </resources>

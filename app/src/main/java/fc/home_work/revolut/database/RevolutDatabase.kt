@@ -4,10 +4,10 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import fc.home_work.revolut.model.Currency
+import fc.home_work.revolut.model.CurrencyModel
 
 
-@Database(entities = [Currency::class],version = 1)
+@Database(entities = [CurrencyModel::class],version = 1)
 abstract class RevolutDatabase : RoomDatabase() {
 
     companion object {

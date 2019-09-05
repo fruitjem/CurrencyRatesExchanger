@@ -6,16 +6,13 @@ import androidx.room.PrimaryKey
 
 
 @Entity(tableName = "CurrencyState")
-class Currency{
+class CurrencyModel{
 
     @PrimaryKey(autoGenerate = false)
     var id: String
 
     @ColumnInfo(name = "currencyExchangeParams")
     var currencyExchangeParams: Double
-
-    var currentValue : Double = 0.0
-
 
     constructor(id:String, currencyExchangeParams:Double = 1.0){
         this.id = id
