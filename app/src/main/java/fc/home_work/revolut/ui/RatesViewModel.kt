@@ -34,6 +34,10 @@ class RatesViewModel : BaseViewModel() {
         return currencyExchangerData
     }
 
+    fun getLoadingObservable(): MutableLiveData<Boolean> {
+        return isLoading
+    }
+
     private fun loadData() {
 
         subscription.add(
@@ -41,7 +45,7 @@ class RatesViewModel : BaseViewModel() {
                 .subscribeOn(Schedulers.io())
                 .doOnNext { lastCurrencyList = it }
                 .map {
-                    buildCurrencyExchangerList(it)
+                    RatesHelper.buildCurrencyExchangerList(it)
                 }
                 .doOnNext { lastCurrencyExchangerList = it }
                 .subscribeOn(Schedulers.computation())
@@ -63,28 +67,17 @@ class RatesViewModel : BaseViewModel() {
         subscription.add(
             Observable.interval(0, 1, TimeUnit.SECONDS)
                 .flatMap { ratesRepo.loadCurrencyRatesFromAPI().toObservable() }
-                .subscribeOn(Schedulers.io())
                 .doOnNext { lastCurrencyList = it }
-                .subscribe({
-                    Timber.d("polling OK !")
+                .subscribeOn(Schedulers.io())
+                .map { RatesHelper.updateCurrencyExchangerList(it,lastCurrencyExchangerList) }
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ updatedExchangerList ->
+                    currencyExchangerData.value = updatedExchangerList
                 }, {
                     Timber.e("Error during polling currencies $it")
                 })
         )
-    }
-
-    private fun buildCurrencyExchangerList(currencyList: ArrayList<CurrencyModel>): ArrayList<CurrencyExchangerModel> {
-        val currExcList = ArrayList<CurrencyExchangerModel>()
-
-        for (currencyModel in currencyList) {
-            currExcList.add(CurrencyExchangerModel(currencyModel))
-        }
-
-        return currExcList
-    }
-
-    private fun updateCurrencyExchangerList() {
-
     }
 
     private fun showLoader(bool: Boolean) {
