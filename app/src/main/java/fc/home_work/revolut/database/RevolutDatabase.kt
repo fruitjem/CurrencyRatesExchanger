@@ -4,11 +4,14 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import fc.home_work.revolut.database.dao.CurrencyRateDAO
 import fc.home_work.revolut.model.CurrencyModel
 
 
 @Database(entities = [CurrencyModel::class],version = 1)
 abstract class RevolutDatabase : RoomDatabase() {
+
+    abstract fun currencyRatesDAO(): CurrencyRateDAO
 
     companion object {
         var INSTANCE: RevolutDatabase? = null

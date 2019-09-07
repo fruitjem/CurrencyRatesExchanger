@@ -19,8 +19,7 @@ class RatesViewModel : BaseViewModel() {
     lateinit var ratesRepo: RatesRepository
 
     //Local Data
-    private lateinit var lastCurrencyList: ArrayList<CurrencyModel>
-    private lateinit var lastCurrencyExchangerList: ArrayList<CurrencyExchangerModel>
+    private var lastCurrencyExchangerList: ArrayList<CurrencyExchangerModel> = ArrayList()
 
     //Live Data
     private val currencyExchangerData: MutableLiveData<ArrayList<CurrencyExchangerModel>> = MutableLiveData()
@@ -39,26 +38,27 @@ class RatesViewModel : BaseViewModel() {
     }
 
     private fun loadData() {
+        observeCurrencyRatesChanges()
+        startRatesPolling()
+    }
 
+
+    private fun observeCurrencyRatesChanges(){
         subscription.add(
-            ratesRepo.loadCurrencyRatesFromAPI().toObservable()
+                ratesRepo.getFlowableRates()
                 .subscribeOn(Schedulers.io())
-                .doOnNext { lastCurrencyList = it }
                 .map {
-                    RatesHelper.buildCurrencyExchangerList(it)
+                    updateCurrencyExchangerList(it as ArrayList<CurrencyModel>)
                 }
-                .doOnNext { lastCurrencyExchangerList = it }
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe { showLoader(true) }
-                .doOnTerminate { showLoader(false) }
                 .subscribe({
-                    Timber.d("Currencies loaded correctly")
-                    currencyExchangerData.value = it
-                    startRatesPolling()
+                    Timber.d("Currencies Flowable update DONE ${it[0].currency.currencyExchangeParams}")
+                    lastCurrencyExchangerList = it
+                    currencyExchangerData.value = lastCurrencyExchangerList
+                    it.forEach{ it.toString() }
                 }, {
                     Timber.e("Error during load currencies $it")
-                    //TODO fire error
                 })
         )
     }
@@ -67,17 +67,27 @@ class RatesViewModel : BaseViewModel() {
         subscription.add(
             Observable.interval(0, 1, TimeUnit.SECONDS)
                 .flatMap { ratesRepo.loadCurrencyRatesFromAPI().toObservable() }
-                .doOnNext { lastCurrencyList = it }
+                .flatMapCompletable { ratesRepo.saveCurrencyRatesOnDB(it) }
                 .subscribeOn(Schedulers.io())
-                .map { RatesHelper.updateCurrencyExchangerList(it,lastCurrencyExchangerList) }
-                .subscribeOn(Schedulers.computation())
+                //.map { RatesHelper.updateCurrencyExchangerList(it,lastCurrencyExchangerList) }
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ updatedExchangerList ->
-                    currencyExchangerData.value = updatedExchangerList
+                .subscribe({
+                    Timber.d("Polling Rates OK, saved items on DB")
                 }, {
                     Timber.e("Error during polling currencies $it")
                 })
         )
+    }
+
+    private fun updateCurrencyExchangerList(updatedCurrencyList:ArrayList<CurrencyModel>): ArrayList<CurrencyExchangerModel> {
+        if(lastCurrencyExchangerList.isEmpty()){
+            Timber.d("Currency Exchange List CREATED")
+            return RatesHelper.buildCurrencyExchangerList(updatedCurrencyList)
+        }
+        else{
+            Timber.d("Currency Exchange List UPDATED")
+            return RatesHelper.updateCurrencyExchangerList(updatedCurrencyList,lastCurrencyExchangerList )
+        }
     }
 
     private fun showLoader(bool: Boolean) {

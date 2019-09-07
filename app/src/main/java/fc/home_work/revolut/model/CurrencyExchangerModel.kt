@@ -21,4 +21,8 @@ data class CurrencyExchangerModel(var currency:CurrencyModel, var currentValue:D
 
     }
 
+    override fun toString(): String {
+        return "Cuurrency:${currency.id} with rate: ${currency.currencyExchangeParams} has value $currentValue"
+    }
+
 }
