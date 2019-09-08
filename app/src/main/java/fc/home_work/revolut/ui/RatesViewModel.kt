@@ -2,7 +2,6 @@ package fc.home_work.revolut.ui
 
 import androidx.lifecycle.MutableLiveData
 import fc.home_work.revolut.base.BaseViewModel
-import fc.home_work.revolut.exception.NoDoubleException
 import fc.home_work.revolut.model.CurrencyExchangerModel
 import fc.home_work.revolut.model.CurrencyModel
 import fc.home_work.revolut.repository.RatesRepository
@@ -11,6 +10,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.lang.Exception
+import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -24,29 +24,41 @@ class RatesViewModel : BaseViewModel() {
     private var lastCurrencyExchangerList: ArrayList<CurrencyExchangerModel> = ArrayList()
 
     //Live Data
-    private val currencyExchangerObservableData: MutableLiveData<ArrayList<CurrencyExchangerModel>> = MutableLiveData()
+    private val currencyExchangerObservableData: MutableLiveData<Pair<ArrayList<CurrencyExchangerModel>,Boolean>> =
+        MutableLiveData()
 
     init {
         loadData()
     }
 
-    fun getCurrencyExchangerObservableList(): MutableLiveData<ArrayList<CurrencyExchangerModel>> {
+    fun getCurrencyExchangerObservableList(): MutableLiveData<Pair<ArrayList<CurrencyExchangerModel>, Boolean>> {
         return currencyExchangerObservableData
     }
 
     /**
      * When the user insert a value on EditText this method is invoked in order to refresh the list Values
      */
-    fun updateListWithNewValue(model:CurrencyExchangerModel, newValue:String){
+    fun updateListWithNewValue(newValue: String) {
 
-        try {
-            val newBaseValue = RatesHelper.calculateNewBaseValue(model.currency.currencyExchangeParams,newValue)
-            lastCurrencyExchangerList = RatesHelper.updateCurrencyExchangerListWithNewBaseValue(lastCurrencyExchangerList,newBaseValue )
-            currencyExchangerObservableData.value = lastCurrencyExchangerList
-        }catch (ex:Exception){
-            lastCurrencyExchangerList = RatesHelper.updateCurrencyExchangerListWithNewBaseValue(lastCurrencyExchangerList,0.0 )
-        }
+        lastCurrencyExchangerList =
+            try {
 
+                val newBaseValue = RatesHelper.calculateNewBaseValue(
+                    lastCurrencyExchangerList[0].currency.currencyExchangeParams,
+                    newValue
+                )
+                RatesHelper.updateCurrencyExchangerListWithNewBaseValue(lastCurrencyExchangerList, newBaseValue)
+            } catch (ex: Exception) {
+                RatesHelper.updateCurrencyExchangerListWithNewBaseValue(lastCurrencyExchangerList, 0.0)
+            } finally {
+                currencyExchangerObservableData.value = Pair(lastCurrencyExchangerList,false)
+            }
+    }
+
+
+    fun swapCurrencyExchangerToTopPosition(position: Int) {
+        lastCurrencyExchangerList = RatesHelper.moveElementInFirstPosition(lastCurrencyExchangerList, position)
+        currencyExchangerObservableData.value = Pair(lastCurrencyExchangerList,true)
     }
 
     private fun loadData() {
@@ -55,20 +67,20 @@ class RatesViewModel : BaseViewModel() {
     }
 
 
-    private fun observeCurrencyRatesChanges(){
+    private fun observeCurrencyRatesChanges() {
         subscription.add(
-                ratesRepo.getFlowableRates()
+            ratesRepo.getFlowableRates()
                 .subscribeOn(Schedulers.io())
                 .map {
                     updateCurrencyExchangerList(it as ArrayList<CurrencyModel>)
                 }
-                .doOnNext{
+                .doOnNext {
                     lastCurrencyExchangerList = it
                 }
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    currencyExchangerObservableData.value = lastCurrencyExchangerList
+                    currencyExchangerObservableData.value = Pair(lastCurrencyExchangerList,false)
                 }, {
                     Timber.e("Error during load currencies $it")
                 })
@@ -90,13 +102,16 @@ class RatesViewModel : BaseViewModel() {
         )
     }
 
-    private fun updateCurrencyExchangerList(updatedCurrencyList:ArrayList<CurrencyModel>): ArrayList<CurrencyExchangerModel> {
-        return if(lastCurrencyExchangerList.isEmpty()){
+    private fun updateCurrencyExchangerList(updatedCurrencyList: ArrayList<CurrencyModel>): ArrayList<CurrencyExchangerModel> {
+        return if (lastCurrencyExchangerList.isEmpty()) {
             Timber.d("Currency Exchange List CREATED")
             RatesHelper.buildCurrencyExchangerList(updatedCurrencyList)
-        } else{
+        } else {
             Timber.d("Currency Exchange List UPDATED")
-            RatesHelper.updateCurrencyExchangerListWithNewRates(updatedCurrencyList,lastCurrencyExchangerList )
+            RatesHelper.updateCurrencyExchangerListWithNewRates(
+                updatedCurrencyList,
+                lastCurrencyExchangerList
+            )
         }
     }
 }

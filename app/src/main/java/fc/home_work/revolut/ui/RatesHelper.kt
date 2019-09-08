@@ -32,7 +32,7 @@ object RatesHelper {
     }
 
     fun updateCurrencyExchangerListWithNewBaseValue(currencyExchangerList:ArrayList<CurrencyExchangerModel>, newBaseValue:Double): ArrayList<CurrencyExchangerModel> {
-        currencyExchangerList.subList(1,currencyExchangerList.size).forEach { t ->  t.calculateValue(newBaseValue) }
+        currencyExchangerList.forEach { t ->  t.calculateValue(newBaseValue) }
         return currencyExchangerList
     }
 
@@ -56,6 +56,14 @@ object RatesHelper {
         }catch (ex:Exception){
             throw ex
         }
+    }
+
+    fun moveElementInFirstPosition(currencyExchangerList:ArrayList<CurrencyExchangerModel>, position:Int): ArrayList<CurrencyExchangerModel> {
+        val elementToSwap = currencyExchangerList[position]
+        currencyExchangerList.removeAt(position)
+        currencyExchangerList.add(0,elementToSwap )
+
+        return currencyExchangerList
     }
 
     //This field should be returned by service

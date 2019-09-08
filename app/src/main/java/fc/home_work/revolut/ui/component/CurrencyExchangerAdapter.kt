@@ -7,12 +7,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import fc.home_work.revolut.R
+import fc.home_work.revolut.base.ui.RatesTextWatcher
 import fc.home_work.revolut.model.CurrencyExchangerModel
-import fc.home_work.revolut.util.afterTextChanged
 import kotlinx.android.synthetic.main.item_currency_exchanger.view.*
 
 class CurrencyExchangerAdapter(private val clickListener: (model: CurrencyExchangerModel, position:Int) -> Unit,
-                               private val onValueChanged:(model: CurrencyExchangerModel, newValue:String) -> Unit) :
+                               private val onValueChanged:(newValue:String) -> Unit) :
     ListAdapter<CurrencyExchangerModel, CurrencyExchangerItemViewHolder>(
         CurrencyExchangerDiffCallback()
     ){
@@ -27,12 +27,13 @@ class CurrencyExchangerAdapter(private val clickListener: (model: CurrencyExchan
                 R.layout.item_currency_exchanger,
                 parent,
                 false
-            )
+            ),
+            onValueChanged
         )
     }
 
     override fun onBindViewHolder(holder: CurrencyExchangerItemViewHolder, position: Int) {
-        holder.bind(getItem(position), position, clickListener, onValueChanged)
+        holder.bind(getItem(position), position, clickListener)
     }
 
     override fun onBindViewHolder(
@@ -44,20 +45,23 @@ class CurrencyExchangerAdapter(private val clickListener: (model: CurrencyExchan
             val bundle = payloads[0] as Bundle
             val newValue = bundle.getDouble(CurrencyExchangerModel.CURRENT_VALUE)
             holder.bindJustTheValue(newValue,position)
+        }else{
+            // default to full bind:
+            super.onBindViewHolder(holder, position, payloads)
         }
 
-        // default to full bind:
-        super.onBindViewHolder(holder, position, payloads)
     }
+
 }
 
-class CurrencyExchangerItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class CurrencyExchangerItemViewHolder(itemView: View, onValueChange:(newValue:String) -> Unit) : RecyclerView.ViewHolder(itemView) {
+
+    private val textWatcher = RatesTextWatcher { onValueChange(it) }
 
     fun bind(
         currencyExchangeModel: CurrencyExchangerModel,
         position: Int,
-        clickListener: (model: CurrencyExchangerModel, position:Int) -> Unit,
-        onValueChanged:(model: CurrencyExchangerModel, newValue:String) -> Unit
+        clickListener: (model: CurrencyExchangerModel, position:Int) -> Unit
     ) {
 
         itemView.currencyCode.text = currencyExchangeModel.currency.id
@@ -65,21 +69,27 @@ class CurrencyExchangerItemViewHolder(itemView: View) : RecyclerView.ViewHolder(
         itemView.currencyFlag.setBackgroundResource(currencyExchangeModel.currencyFlagResourceID)
         itemView.currencyDescription.text = itemView.context.resources.getString(currencyExchangeModel.currencyDescriptionResourceID)
 
-        //Enable EditText only for the first item
-        itemView.currencyExchangeValue.isEnabled = (position == 0)
+        itemView.currencyExchangeValue.setOnFocusChangeListener { v, hasFocus ->
+            if(hasFocus)
+                itemView.currencyExchangeValue.addTextChangedListener(textWatcher)
+            else
+                itemView.currencyExchangeValue.removeTextChangedListener(textWatcher)
+        }
 
         //Add clickListener for the other rows
         when(position){
             0 -> {
                 itemView.setOnClickListener(null)
-                itemView.currencyExchangeValue.afterTextChanged { newValue -> onValueChanged(currencyExchangeModel,newValue ) }
+                itemView.currencyExchangeValue.isEnabled = true
+                itemView.currencyExchangeValue.requestFocus()
             }
             else -> {
                 itemView.setOnClickListener { clickListener(currencyExchangeModel, position) }
+                itemView.currencyExchangeValue.isEnabled = false
+
             }
         }
     }
-
 
     fun bindJustTheValue(
         newValue: Double,

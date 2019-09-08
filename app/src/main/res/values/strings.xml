@@ -7,6 +7,7 @@
     <string name="currency_SEK_description">Swedish Krona</string>
     <string name="currency_CAN_description">Canadian Dollar</string>
     <string name="currency_OTHER_description">Other</string>
+    <string name="rates_label">Rates</string>
 
 
     <string-array name="currencies">

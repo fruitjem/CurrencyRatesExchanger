@@ -6,7 +6,6 @@
         android:paddingTop="@dimen/_10sdp"
         android:paddingBottom="@dimen/_10sdp">
 
-
     <ImageView
             android:id="@+id/currencyFlag"
             android:layout_width="@dimen/_30sdp"
@@ -15,13 +14,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-    <fc.home_work.revolut.base.ui.RevolutTextView
+    <fc.home_work.revolut.base.ui.RevolutTextViewBold
             android:id="@+id/currencyCode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/_10sdp"
             android:textColor="@color/revolutBlack"
-            android:textSize="@dimen/_14sdp"
+            android:textSize="@dimen/_13sdp"
             app:layout_constraintStart_toEndOf="@+id/currencyFlag"
             app:layout_constraintTop_toTopOf="@+id/currencyFlag" />
 
@@ -31,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/revolutGrey"
-            android:textSize="@dimen/_12sdp"
+            android:textSize="@dimen/_10sdp"
             app:layout_constraintBottom_toBottomOf="@+id/currencyFlag"
             app:layout_constraintStart_toStartOf="@+id/currencyCode" />
 

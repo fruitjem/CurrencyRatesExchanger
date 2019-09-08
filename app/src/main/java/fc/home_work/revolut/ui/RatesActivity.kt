@@ -31,8 +31,10 @@ class RatesActivity : BaseActivity() {
         currenciesRV.layoutManager = layoutManager
         currencyExchangerAdapter = CurrencyExchangerAdapter (
             {  model, position -> onCurrencyCLicked(model,position) },
-            {  model,value -> onNewBaseValueToCalculate(model,value)}
+            {  value -> onNewBaseValueToCalculate(value)}
         )
+
+
         currenciesRV.adapter = currencyExchangerAdapter
 
         onViewsInitComplete()
@@ -40,24 +42,37 @@ class RatesActivity : BaseActivity() {
 
     private fun onCurrencyCLicked(currencyClicked:CurrencyExchangerModel, position:Int){
         Timber.d("Currency clicked ${currencyClicked.currency.id} at position $position")
+        viewModel.swapCurrencyExchangerToTopPosition(position)
     }
 
-    private fun onNewBaseValueToCalculate(currencyExcChanged:CurrencyExchangerModel, newValue:String){
-        viewModel.updateListWithNewValue( currencyExcChanged,newValue )
+    private fun onNewBaseValueToCalculate(newValue:String){
+        viewModel.updateListWithNewValue( newValue )
     }
 
     private fun observeViewModel(){
-
         viewModel.getCurrencyExchangerObservableList().observe(this, Observer {
-            updateList(it)
+            if(it.second)
+                updateListWithReBind(it.first)
+            else
+                updateList(it.first)
         })
-
     }
 
     private fun updateList(currencyExchangerList:ArrayList<CurrencyExchangerModel>){
         currencyExchangerAdapter?.submitList(
             currencyExchangerList.mapTo(ArrayList()){ it.copy() }
-        ) 
+        )
+    }
+
+
+    private fun updateListWithReBind(currencyExchangerList:ArrayList<CurrencyExchangerModel>){
+        currencyExchangerAdapter?.submitList(
+            currencyExchangerList.mapTo(ArrayList()){ it.copy() }
+        ) {
+            for(i in 0 until currencyExchangerList.size){
+                currencyExchangerAdapter?.notifyItemChanged(i)
+            }
+        }
     }
 
 }

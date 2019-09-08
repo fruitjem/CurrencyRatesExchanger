@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import timber.log.Timber
 import java.math.RoundingMode
+import java.text.DecimalFormat
 
 data class CurrencyExchangerModel(var currency:CurrencyModel, @DrawableRes val currencyFlagResourceID:Int, @StringRes val currencyDescriptionResourceID:Int, var currentValue:Double = 0.0){
 
@@ -15,6 +16,7 @@ data class CurrencyExchangerModel(var currency:CurrencyModel, @DrawableRes val c
 
     fun calculateValue(newValue:Double){
         lastBaseValue = newValue
+
         this.currentValue = (newValue * currency.currencyExchangeParams).toBigDecimal().setScale(2, RoundingMode.UP ).toDouble()
     }
 
