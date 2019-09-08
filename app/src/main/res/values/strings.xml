@@ -1,5 +1,13 @@
 <resources>
+
     <string name="app_name">Revolut</string>
+
+    <string name="currency_EUR_description">Euro</string>
+    <string name="currency_USD_description">US Dollar</string>
+    <string name="currency_SEK_description">Swedish Krona</string>
+    <string name="currency_CAN_description">Canadian Dollar</string>
+    <string name="currency_OTHER_description">Other</string>
+
 
     <string-array name="currencies">
         <item>USD</item>
@@ -7,5 +15,7 @@
         <item>SEK</item>
         <item>CAD</item>
     </string-array>
+
+
 
 </resources>

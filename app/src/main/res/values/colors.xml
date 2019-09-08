@@ -3,4 +3,9 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+
+
+    <color name="revolutBlack">#191C1F</color>
+    <color name="revolutGrey">#8B959E</color>
+
 </resources>
