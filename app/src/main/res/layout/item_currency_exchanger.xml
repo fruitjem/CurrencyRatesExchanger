@@ -49,7 +49,7 @@
             app:layout_constraintHorizontal_bias="1"
             app:layout_constraintBottom_toBottomOf="@+id/currencyFlag"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/currencyCode"
+            app:layout_constraintStart_toEndOf="@+id/currencyDescription"
             app:layout_constraintTop_toTopOf="@+id/currencyFlag" />
 
 
