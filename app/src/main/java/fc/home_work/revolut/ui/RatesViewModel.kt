@@ -5,12 +5,12 @@ import fc.home_work.revolut.base.BaseViewModel
 import fc.home_work.revolut.model.CurrencyExchangerModel
 import fc.home_work.revolut.model.CurrencyModel
 import fc.home_work.revolut.repository.RatesRepository
+import fc.home_work.revolut.util.RATES_POLLING
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.lang.Exception
-import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -55,24 +55,26 @@ class RatesViewModel : BaseViewModel() {
             }
     }
 
-
     fun swapCurrencyExchangerToTopPosition(position: Int) {
         lastCurrencyExchangerList = RatesHelper.moveElementInFirstPosition(lastCurrencyExchangerList, position)
         currencyExchangerObservableData.value = Pair(lastCurrencyExchangerList,true)
     }
+
 
     private fun loadData() {
         observeCurrencyRatesChanges()
         startRatesPolling()
     }
 
-
+    /**
+     * Listen from DB source and update the CurrencyExchangeModel with last Rates available
+     */
     private fun observeCurrencyRatesChanges() {
         subscription.add(
             ratesRepo.getFlowableRates()
                 .subscribeOn(Schedulers.io())
                 .map {
-                    updateCurrencyExchangerList(it as ArrayList<CurrencyModel>)
+                    updateCurrencyExchangerListWithNewRates(it as ArrayList<CurrencyModel>)
                 }
                 .doOnNext {
                     lastCurrencyExchangerList = it
@@ -80,16 +82,19 @@ class RatesViewModel : BaseViewModel() {
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    currencyExchangerObservableData.value = Pair(lastCurrencyExchangerList,false)
+                    currencyExchangerObservableData.value = Pair(lastCurrencyExchangerList,false) //Update Live DATA
                 }, {
                     Timber.e("Error during load currencies $it")
                 })
         )
     }
 
+    /**
+     * Polling the Rates service and save new CurrencyModels on DB
+     */
     private fun startRatesPolling() {
         subscription.add(
-            Observable.interval(0, 1, TimeUnit.SECONDS)
+            Observable.interval(0, RATES_POLLING, TimeUnit.SECONDS)
                 .flatMap { ratesRepo.loadCurrencyRatesFromAPI().toObservable() }
                 .flatMapCompletable { ratesRepo.saveCurrencyRatesOnDB(it) }
                 .subscribeOn(Schedulers.io())
@@ -102,7 +107,7 @@ class RatesViewModel : BaseViewModel() {
         )
     }
 
-    private fun updateCurrencyExchangerList(updatedCurrencyList: ArrayList<CurrencyModel>): ArrayList<CurrencyExchangerModel> {
+    private fun updateCurrencyExchangerListWithNewRates(updatedCurrencyList: ArrayList<CurrencyModel>): ArrayList<CurrencyExchangerModel> {
         return if (lastCurrencyExchangerList.isEmpty()) {
             Timber.d("Currency Exchange List CREATED")
             RatesHelper.buildCurrencyExchangerList(updatedCurrencyList)

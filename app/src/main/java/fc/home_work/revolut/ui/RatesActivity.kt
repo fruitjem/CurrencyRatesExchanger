@@ -34,7 +34,6 @@ class RatesActivity : BaseActivity() {
             {  value -> onNewBaseValueToCalculate(value)}
         )
 
-
         currenciesRV.adapter = currencyExchangerAdapter
 
         onViewsInitComplete()
@@ -50,11 +49,12 @@ class RatesActivity : BaseActivity() {
     }
 
     private fun observeViewModel(){
+
         viewModel.getCurrencyExchangerObservableList().observe(this, Observer {
             if(it.second)
-                updateListWithReBind(it.first)
+                updateListWithReBind(it.first) //if element position is changed need a rebind
             else
-                updateList(it.first)
+                updateList(it.first) //changed just the value to show
         })
     }
 

@@ -12,6 +12,11 @@ import java.lang.Exception
 
 object RatesHelper {
 
+    /**
+     * Create a CurrencyExchangeList with default value = 0
+     * @params: currencyList ArrayList of currencies model
+     * @return  ArrayList<CurrencyExchangeList>
+     */
     fun buildCurrencyExchangerList(currencyList: ArrayList<CurrencyModel>): ArrayList<CurrencyExchangerModel> {
         val currExcList = ArrayList<CurrencyExchangerModel>()
         for (currencyModel in currencyList) {
@@ -26,18 +31,29 @@ object RatesHelper {
     }
 
 
+    /**
+     * Update the <currencyExchangerList> with the new currencies rates values but the same baseValue
+     * @return updated list
+     */
     fun updateCurrencyExchangerListWithNewRates(currencyList: ArrayList<CurrencyModel>, currencyExchangerList:ArrayList<CurrencyExchangerModel> ): ArrayList<CurrencyExchangerModel> {
-        currencyExchangerList.forEach { t ->  t.updateRateValue(getCurrencyValueByID(currencyList, t.currency.id)) }
+        currencyExchangerList.forEach { t ->  t.updateRateValue(getCurrencyRateByID(currencyList, t.currency.id)) }
         return currencyExchangerList
     }
 
+    /**
+     * Update the <currencyExchangerList> with the new base value but the same currency rate
+     * @return updated list
+     */
     fun updateCurrencyExchangerListWithNewBaseValue(currencyExchangerList:ArrayList<CurrencyExchangerModel>, newBaseValue:Double): ArrayList<CurrencyExchangerModel> {
         currencyExchangerList.forEach { t ->  t.calculateValue(newBaseValue) }
         return currencyExchangerList
     }
 
-
-    fun getCurrencyValueByID(currencyList: ArrayList<CurrencyModel>, currencyID:String): Double? {
+    /**
+     * Return the value  with the ID passed as parameters if exist, null otherwise
+     * @return Double: specific currency rate or NULL
+     */
+    fun getCurrencyRateByID(currencyList: ArrayList<CurrencyModel>, currencyID:String): Double? {
         for (element in currencyList){
             if(currencyID == element.id) return element.currencyExchangeParams
         }
@@ -45,12 +61,17 @@ object RatesHelper {
         return null
     }
 
-    fun calculateNewBaseValue(currencyExchangeParam:Double, newValue:String):Double{
-        try {
 
+    /**
+     * Return the BaseValue calculated from another currency (potentially) based on the currency amount and the currency rate
+     * @return Double: new BaseValue
+     * @exception: @NumberFormatException
+     * @exception: @Exception
+     */
+    fun calculateNewBaseValue(currencyExchangeParam:Double, newValue:String) : Double {
+        try {
             if(newValue.isNullOrEmpty()) return 0.0
             return ( newValue.toDouble() / currencyExchangeParam )
-
         }catch (noDouble:NumberFormatException){
             throw NoDoubleException()
         }catch (ex:Exception){
@@ -58,15 +79,20 @@ object RatesHelper {
         }
     }
 
-    fun moveElementInFirstPosition(currencyExchangerList:ArrayList<CurrencyExchangerModel>, position:Int): ArrayList<CurrencyExchangerModel> {
-        val elementToSwap = currencyExchangerList[position]
-        currencyExchangerList.removeAt(position)
-        currencyExchangerList.add(0,elementToSwap )
-
-        return currencyExchangerList
+    /**
+     * Swap the element at position <position> in top of the List and scale by 1 position the others
+     */
+    fun <T> moveElementInFirstPosition(list:ArrayList<T>, position:Int): ArrayList<T> {
+        val elementToSwap = list[position]
+        list.removeAt(position)
+        list.add(0,elementToSwap )
+        return list
     }
 
-    //This field should be returned by service
+
+    /**
+     * Get flag image resource by CurrencyID
+     */
     fun getCurrencyFlagResourceByID(currencyID:String):Int{
         return when(currencyID){
             CURRENCY_EUR -> R.drawable.icon_eu_flag
@@ -77,7 +103,9 @@ object RatesHelper {
         }
     }
 
-    //This field should be returned by service
+    /**
+     * Get description resource by CurrencyID
+     */
     fun getCurrencyDescriptionByID(currencyID:String):Int{
         return when(currencyID){
             CURRENCY_EUR -> R.string.currency_EUR_description
