@@ -20,7 +20,7 @@ class RatesHelperTest {
 
 
     @Before
-    fun initStuff(){
+    fun setUp(){
         val currencyMockBase = CurrencyModel("BASE")
         val currencyMockDouble = CurrencyModel("DOUBLE",0.5)
         val currencyMockHalf = CurrencyModel("HALF",2.0)

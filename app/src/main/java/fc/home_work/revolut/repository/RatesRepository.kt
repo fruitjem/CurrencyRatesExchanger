@@ -12,7 +12,7 @@ import io.reactivex.Flowable
 import io.reactivex.Single
 import javax.inject.Inject
 
-class RatesRepository(context:Context) : BaseRepository(context){
+open class RatesRepository(context:Context) : BaseRepository(context){
 
     @Inject
     lateinit var ratesAPI: RatesAPI

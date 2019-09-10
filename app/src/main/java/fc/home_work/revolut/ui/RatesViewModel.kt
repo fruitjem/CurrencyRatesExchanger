@@ -12,13 +12,9 @@ import io.reactivex.schedulers.Schedulers
 import timber.log.Timber
 import java.lang.Exception
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import kotlin.collections.ArrayList
 
-class RatesViewModel : BaseViewModel() {
-
-    @Inject
-    lateinit var ratesRepo: RatesRepository
+open class RatesViewModel(private val ratesRepo: RatesRepository) : BaseViewModel() {
 
     //Local Data
     private var lastCurrencyExchangerList: ArrayList<CurrencyExchangerModel> = ArrayList()
@@ -27,8 +23,13 @@ class RatesViewModel : BaseViewModel() {
     private val currencyExchangerObservableData: MutableLiveData<Pair<ArrayList<CurrencyExchangerModel>,Boolean>> =
         MutableLiveData()
 
-    init {
-        loadData()
+    fun loadData() {
+        observeCurrencyRatesChanges()
+        startRatesPolling()
+    }
+
+    fun stopPolling(){
+        subscription.clear()
     }
 
     fun getCurrencyExchangerObservableList(): MutableLiveData<Pair<ArrayList<CurrencyExchangerModel>, Boolean>> {
@@ -60,12 +61,6 @@ class RatesViewModel : BaseViewModel() {
         currencyExchangerObservableData.value = Pair(lastCurrencyExchangerList,true)
     }
 
-
-    private fun loadData() {
-        observeCurrencyRatesChanges()
-        startRatesPolling()
-    }
-
     /**
      * Listen from DB source and update the CurrencyExchangeModel with last Rates available
      */
@@ -93,6 +88,7 @@ class RatesViewModel : BaseViewModel() {
      * Polling the Rates service and save new CurrencyModels on DB
      */
     private fun startRatesPolling() {
+
         subscription.add(
             Observable.interval(0, RATES_POLLING, TimeUnit.SECONDS)
                 .flatMap { ratesRepo.loadCurrencyRatesFromAPI().toObservable() }

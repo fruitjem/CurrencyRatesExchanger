@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import fc.home_work.revolut.R
 import fc.home_work.revolut.base.BaseActivity
 import fc.home_work.revolut.model.CurrencyExchangerModel
+import fc.home_work.revolut.repository.RatesRepository
 import fc.home_work.revolut.ui.component.CurrencyExchangerAdapter
 import fc.home_work.revolut.util.getViewModel
 import kotlinx.android.synthetic.main.activity_rates.*
@@ -15,12 +16,14 @@ import timber.log.Timber
 class RatesActivity : BaseActivity() {
 
     private lateinit var viewModel : RatesViewModel
-    private var currencyExchangerAdapter : CurrencyExchangerAdapter? = null
+    private lateinit var currencyExchangerAdapter : CurrencyExchangerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_rates)
-        viewModel = getViewModel()
+
+        viewModel = getViewModel{RatesViewModel(RatesRepository(this))}
+
         initViews { observeViewModel() }
     }
 
@@ -39,6 +42,16 @@ class RatesActivity : BaseActivity() {
         onViewsInitComplete()
     }
 
+    private fun observeViewModel(){
+
+        viewModel.getCurrencyExchangerObservableList().observe(this, Observer {
+            if(it.second)
+                updateListWithReBind(it.first) //if elements position is changed rebind
+            else
+                updateList(it.first) //changed just the value to show
+        })
+    }
+
     private fun onCurrencyCLicked(currencyClicked:CurrencyExchangerModel, position:Int){
         Timber.d("Currency clicked ${currencyClicked.currency.id} at position $position")
         viewModel.swapCurrencyExchangerToTopPosition(position)
@@ -48,22 +61,11 @@ class RatesActivity : BaseActivity() {
         viewModel.updateListWithNewValue( newValue )
     }
 
-    private fun observeViewModel(){
-
-        viewModel.getCurrencyExchangerObservableList().observe(this, Observer {
-            if(it.second)
-                updateListWithReBind(it.first) //if element position is changed need a rebind
-            else
-                updateList(it.first) //changed just the value to show
-        })
-    }
-
     private fun updateList(currencyExchangerList:ArrayList<CurrencyExchangerModel>){
         currencyExchangerAdapter?.submitList(
             currencyExchangerList.mapTo(ArrayList()){ it.copy() }
         )
     }
-
 
     private fun updateListWithReBind(currencyExchangerList:ArrayList<CurrencyExchangerModel>){
         currencyExchangerAdapter?.submitList(
@@ -73,6 +75,17 @@ class RatesActivity : BaseActivity() {
                 currencyExchangerAdapter?.notifyItemChanged(i)
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadData()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.stopPolling()
+
     }
 
 }
