@@ -6,6 +6,8 @@ import fc.home_work.revolut.base.BaseViewModel
 import fc.home_work.revolut.model.CurrencyExchangerModel
 import fc.home_work.revolut.model.CurrencyModel
 import fc.home_work.revolut.repository.RatesRepository
+import fc.home_work.revolut.ui.helper.CurrencyHelper
+import fc.home_work.revolut.ui.helper.CurrencyExchagerHelper
 import fc.home_work.revolut.util.RATES_POLLING
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -45,21 +47,21 @@ open class RatesViewModel(private val ratesRepo: RatesRepository) : BaseViewMode
         lastCurrencyExchangerList =
             try {
 
-                val newBaseValue = RatesHelper.calculateNewBaseValue(
+                val newBaseValue = CurrencyHelper.calculateNewBaseValue(
                     lastCurrencyExchangerList[0].currency.currencyExchangeParams,
                     newValue
                 )
-                RatesHelper.updateCurrencyExchangerListWithNewBaseValue(lastCurrencyExchangerList, newBaseValue)
+                CurrencyExchagerHelper.updateCurrencyExchangerListWithNewBaseValue(lastCurrencyExchangerList, newBaseValue)
 
             } catch (ex: Exception) {
-                RatesHelper.updateCurrencyExchangerListWithNewBaseValue(lastCurrencyExchangerList, 0.0)
+                CurrencyExchagerHelper.updateCurrencyExchangerListWithNewBaseValue(lastCurrencyExchangerList, 0.0)
             } finally {
                 currencyExchangerObservableData.value = Pair(lastCurrencyExchangerList,false)
             }
     }
 
     fun swapCurrencyExchangerToTopPosition(position: Int) {
-        lastCurrencyExchangerList = RatesHelper.moveElementInFirstPosition(lastCurrencyExchangerList, position)
+        lastCurrencyExchangerList = CurrencyExchagerHelper.moveElementInFirstPosition(lastCurrencyExchangerList, position)
         currencyExchangerObservableData.value = Pair(lastCurrencyExchangerList,true)
     }
 
@@ -125,10 +127,10 @@ open class RatesViewModel(private val ratesRepo: RatesRepository) : BaseViewMode
     private fun updateCurrencyExchangerListWithNewRates(updatedCurrencyList: ArrayList<CurrencyModel>): ArrayList<CurrencyExchangerModel> {
         return if (lastCurrencyExchangerList.isEmpty()) {
             Timber.d("Currency Exchange List CREATED")
-            RatesHelper.buildCurrencyExchangerList(updatedCurrencyList)
+            CurrencyExchagerHelper.buildCurrencyExchangerList(updatedCurrencyList)
         } else {
             Timber.d("Currency Exchange List UPDATED")
-            RatesHelper.updateCurrencyExchangerListWithNewRates(
+            CurrencyExchagerHelper.updateCurrencyExchangerListWithNewRates(
                 updatedCurrencyList,
                 lastCurrencyExchangerList
             )

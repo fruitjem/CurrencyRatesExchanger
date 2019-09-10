@@ -2,7 +2,7 @@ package fc.home_work.revolut
 
 import fc.home_work.revolut.model.CurrencyExchangerModel
 import fc.home_work.revolut.model.CurrencyModel
-import fc.home_work.revolut.ui.RatesHelper
+import fc.home_work.revolut.ui.helper.CurrencyHelper
 import junit.framework.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -18,8 +18,8 @@ class CurrencyExchangeModelTest {
 
         currencyExchangeModelBase = CurrencyExchangerModel(
             currencyMockBase,
-            RatesHelper.getCurrencyFlagResourceByID("USD"),
-            RatesHelper.getCurrencyDescriptionByID("USD"))
+            CurrencyHelper.getCurrencyFlagResourceByID("USD"),
+            CurrencyHelper.getCurrencyDescriptionByID("USD"))
 
     }
 

@@ -2,7 +2,7 @@ package fc.home_work.revolut.model
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import fc.home_work.revolut.ui.RatesHelper
+import fc.home_work.revolut.ui.helper.CurrencyHelper
 import timber.log.Timber
 
 data class CurrencyExchangerModel(var currency:CurrencyModel, @DrawableRes val currencyFlagResourceID:Int, @StringRes val currencyDescriptionResourceID:Int, var currentValue:Double = 0.0){
@@ -18,7 +18,7 @@ data class CurrencyExchangerModel(var currency:CurrencyModel, @DrawableRes val c
      **/
     fun calculateValue(newBaseValue:Double){
         lastBaseValue = newBaseValue
-        this.currentValue = RatesHelper.roundDoubleValueTo2DecimalUp(newBaseValue * currency.currencyExchangeParams)
+        this.currentValue = CurrencyHelper.roundDoubleValueTo2DecimalUp(newBaseValue * currency.currencyExchangeParams)
     }
 
     /**

@@ -5,7 +5,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import fc.home_work.revolut.database.RevolutDatabase
 import fc.home_work.revolut.model.CurrencyModel
-import fc.home_work.revolut.ui.RatesHelper
+import fc.home_work.revolut.ui.helper.CurrencyExchagerHelper
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -63,10 +63,10 @@ class RatesDaoTest {
             .assertValue {
                 it.isNotEmpty()
             }
-            .assertValue { RatesHelper.getCurrencyRateByID(it as ArrayList<CurrencyModel>,"BASE") != null }
-            .assertValue { RatesHelper.getCurrencyRateByID(it as ArrayList<CurrencyModel>,"DOUBLE") != null }
-            .assertValue { RatesHelper.getCurrencyRateByID(it as ArrayList<CurrencyModel>,"HALF") != null }
-            .assertValue { RatesHelper.getCurrencyRateByID(it as ArrayList<CurrencyModel>,"ABCDE") == null }
+            .assertValue { CurrencyExchagerHelper.getCurrencyRateByID(it as ArrayList<CurrencyModel>,"BASE") != null }
+            .assertValue { CurrencyExchagerHelper.getCurrencyRateByID(it as ArrayList<CurrencyModel>,"DOUBLE") != null }
+            .assertValue { CurrencyExchagerHelper.getCurrencyRateByID(it as ArrayList<CurrencyModel>,"HALF") != null }
+            .assertValue { CurrencyExchagerHelper.getCurrencyRateByID(it as ArrayList<CurrencyModel>,"ABCDE") == null }
 
     }
 }
