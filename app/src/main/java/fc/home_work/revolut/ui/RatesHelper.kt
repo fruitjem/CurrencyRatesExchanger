@@ -9,6 +9,7 @@ import fc.home_work.revolut.util.CURRENCY_EUR
 import fc.home_work.revolut.util.CURRENCY_SEK
 import fc.home_work.revolut.util.CURRENCY_USD
 import java.lang.Exception
+import java.math.RoundingMode
 
 object RatesHelper {
 
@@ -89,6 +90,9 @@ object RatesHelper {
         return list
     }
 
+    fun roundDoubleValueTo2DecimalUp(doubleValue:Double): Double {
+        return doubleValue.toBigDecimal().setScale(2, RoundingMode.UP ).toDouble()
+    }
 
     /**
      * Get flag image resource by CurrencyID

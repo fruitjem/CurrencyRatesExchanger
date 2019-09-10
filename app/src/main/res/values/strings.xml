@@ -9,6 +9,12 @@
     <string name="currency_OTHER_description">Other</string>
     <string name="rates_label">Rates</string>
 
+    <!-- Error messages  -->
+    <string name="user_is_offline_error">You need to be online the first time"</string>
+    <string name="user_is_offline_warning">Value could not be updated when you are offline. Check connection !</string>
+
+
+    <!-- Supported currencies  -->
 
     <string-array name="currencies">
         <item>USD</item>

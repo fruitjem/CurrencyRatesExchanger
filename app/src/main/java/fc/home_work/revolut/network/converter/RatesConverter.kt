@@ -13,7 +13,7 @@ object RatesConverter {
         result.add(CurrencyModel(dto.base))
 
         //add the other currencies rates
-        for (supportedCurrency in supportedCurrencyArray){
+        for (supportedCurrency in supportedCurrencyArray) {
             val rateValue = dto.rates.getValueByCurrencyID(supportedCurrency)
             if(rateValue != null)
                 result.add( CurrencyModel(supportedCurrency,rateValue) )

@@ -2,9 +2,8 @@ package fc.home_work.revolut.model
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import fc.home_work.revolut.ui.RatesHelper
 import timber.log.Timber
-import java.math.RoundingMode
-import java.text.DecimalFormat
 
 data class CurrencyExchangerModel(var currency:CurrencyModel, @DrawableRes val currencyFlagResourceID:Int, @StringRes val currencyDescriptionResourceID:Int, var currentValue:Double = 0.0){
 
@@ -14,12 +13,17 @@ data class CurrencyExchangerModel(var currency:CurrencyModel, @DrawableRes val c
         lastBaseValue = currentValue
     }
 
-    fun calculateValue(newValue:Double){
-        lastBaseValue = newValue
-
-        this.currentValue = (newValue * currency.currencyExchangeParams).toBigDecimal().setScale(2, RoundingMode.UP ).toDouble()
+    /**
+     * On <newBaseValue> update its current value
+     **/
+    fun calculateValue(newBaseValue:Double){
+        lastBaseValue = newBaseValue
+        this.currentValue = RatesHelper.roundDoubleValueTo2DecimalUp(newBaseValue * currency.currencyExchangeParams)
     }
 
+    /**
+     * On <newRateValue> update its current value
+     **/
     fun updateRateValue(newRate:Double?){
         if(newRate != null){
             currency.currencyExchangeParams = newRate
@@ -28,15 +32,14 @@ data class CurrencyExchangerModel(var currency:CurrencyModel, @DrawableRes val c
             Timber.e("Currency ${currency.id} not well handled, check it")
         }
 
-        Timber.d("new value for currency ${currency.id} --> with rate $newRate  [$currentValue]")
-
+        Timber.d(toString())
     }
 
     override fun toString(): String {
-        return "Cuurrency:${currency.id} with rate: ${currency.currencyExchangeParams} has value $currentValue"
+        return "Currency:${currency.id} with rate: ${currency.currencyExchangeParams} has value $currentValue"
     }
 
-    companion object{
+    companion object {
         const val CURRENT_VALUE = "CURRENT_VALUE"
     }
 

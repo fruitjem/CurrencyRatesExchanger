@@ -24,9 +24,5 @@ abstract class RevolutDatabase : RoomDatabase() {
             }
             return INSTANCE
         }
-
-        fun destroyDataBase(){
-            INSTANCE = null
-        }
     }
 }

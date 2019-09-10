@@ -8,7 +8,6 @@ import org.junit.Before
 import org.junit.Test
 import java.lang.Exception
 
-
 /**
  * Unit tests for the Rates / Currencies logic.
  */
@@ -17,7 +16,6 @@ class RatesHelperTest {
     private var currencyExchangeList = ArrayList<CurrencyExchangerModel>()
     private var currencyList = ArrayList<CurrencyModel>()
     private var updatedCurrencyList = ArrayList<CurrencyModel>()
-
 
     @Before
     fun setUp(){
@@ -135,7 +133,8 @@ class RatesHelperTest {
         list.add(4)
         list.add(5)
 
-        val listWithFiveOnTop = RatesHelper.moveElementInFirstPosition(list as java.util.ArrayList<Int>,4)
+        //test the top element and the shift
+        val listWithFiveOnTop = RatesHelper.moveElementInFirstPosition(list,4)
 
         assertTrue(listWithFiveOnTop[0] == 5)
         assertTrue(listWithFiveOnTop[1] == 1)
@@ -143,10 +142,23 @@ class RatesHelperTest {
         assertTrue(listWithFiveOnTop[3] == 3)
         assertTrue(listWithFiveOnTop[4] == 4)
 
-
-        val listWithThreeOnTop = RatesHelper.moveElementInFirstPosition(list as ArrayList<Int>,3)
+        //test the top element
+        val listWithThreeOnTop = RatesHelper.moveElementInFirstPosition(list,3)
         assertTrue(listWithThreeOnTop[0] == 3)
 
+    }
+
+    @Test
+    fun roundValueUpWorksFine(){
+
+        val hugeDouble = 0.45000000000234
+        val hugeDouble2 = 0.45000000000
+
+        assertTrue(RatesHelper.roundDoubleValueTo2DecimalUp(hugeDouble).toString().length == 4)
+
+        assertTrue(RatesHelper.roundDoubleValueTo2DecimalUp(hugeDouble)  == 0.46)
+
+        assertTrue(RatesHelper.roundDoubleValueTo2DecimalUp(hugeDouble2)  == 0.45)
 
     }
 

@@ -1,6 +1,7 @@
 package fc.home_work.revolut.ui
 
 import androidx.lifecycle.MutableLiveData
+import fc.home_work.revolut.R
 import fc.home_work.revolut.base.BaseViewModel
 import fc.home_work.revolut.model.CurrencyExchangerModel
 import fc.home_work.revolut.model.CurrencyModel
@@ -49,6 +50,7 @@ open class RatesViewModel(private val ratesRepo: RatesRepository) : BaseViewMode
                     newValue
                 )
                 RatesHelper.updateCurrencyExchangerListWithNewBaseValue(lastCurrencyExchangerList, newBaseValue)
+
             } catch (ex: Exception) {
                 RatesHelper.updateCurrencyExchangerListWithNewBaseValue(lastCurrencyExchangerList, 0.0)
             } finally {
@@ -64,7 +66,7 @@ open class RatesViewModel(private val ratesRepo: RatesRepository) : BaseViewMode
     /**
      * Listen from DB source and update the CurrencyExchangeModel with last Rates available
      */
-    private fun observeCurrencyRatesChanges() {
+    fun observeCurrencyRatesChanges() {
         subscription.add(
             ratesRepo.getFlowableRates()
                 .subscribeOn(Schedulers.io())
@@ -99,6 +101,23 @@ open class RatesViewModel(private val ratesRepo: RatesRepository) : BaseViewMode
                     Timber.d("Polling Rates OK, saved items on DB")
                 }, {
                     Timber.e("Error during polling currencies $it")
+                    checkIfDatabaseIsEmptyAndShowAlert()
+                })
+        )
+    }
+
+    fun checkIfDatabaseIsEmptyAndShowAlert(){
+        subscription.add(
+                ratesRepo.checkIfRatesDBTableIsEmpty()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ isEmpty ->
+                    if(isEmpty)
+                        fireErrorEvent(R.string.user_is_offline_error)
+                    else
+                        fireErrorEvent(R.string.user_is_offline_warning)
+                },{
+                    Timber.e("Something went wrong during database check $it")
                 })
         )
     }

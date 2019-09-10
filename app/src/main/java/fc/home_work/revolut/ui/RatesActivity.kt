@@ -1,6 +1,7 @@
 package fc.home_work.revolut.ui
 
 import android.os.Bundle
+import android.view.View
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -17,6 +18,10 @@ class RatesActivity : BaseActivity() {
 
     private lateinit var viewModel : RatesViewModel
     private lateinit var currencyExchangerAdapter : CurrencyExchangerAdapter
+
+    override fun instantiateErrorView(): View {
+        return ratesRootView
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +55,8 @@ class RatesActivity : BaseActivity() {
             else
                 updateList(it.first) //changed just the value to show
         })
+
+        observeErrors(viewModel)
     }
 
     private fun onCurrencyCLicked(currencyClicked:CurrencyExchangerModel, position:Int){

@@ -20,8 +20,6 @@ abstract class BaseRepository (protected val context: Context) {
             .databaseModule(DatabaseModule)
             .build()
 
-    protected var subscription: CompositeDisposable = CompositeDisposable()
-
     init {
         inject()
     }

@@ -9,6 +9,7 @@ import fc.home_work.revolut.network.RatesAPI
 import fc.home_work.revolut.network.converter.RatesConverter
 import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.Observable
 import io.reactivex.Single
 import javax.inject.Inject
 
@@ -40,6 +41,11 @@ open class RatesRepository(context:Context) : BaseRepository(context){
      */
     fun getFlowableRates(): Flowable<List<CurrencyModel>> {
         return db.currencyRatesDAO().getAll()
+    }
+
+    fun checkIfRatesDBTableIsEmpty(): Observable<Boolean> {
+        return db.currencyRatesDAO().getAll().map { list -> list.isEmpty() }.toObservable()
+
     }
 
     companion object {
